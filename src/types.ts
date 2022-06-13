@@ -1,9 +1,11 @@
 import { $Fetch } from "ohmyfetch"
 
+// TODO 删除T泛型支持更广泛的错误数据结构定义
+
 export interface IOptions<T extends any = any> {
 	dev?: boolean        // 开发模式
 	persist: boolean     // 开启持久化存储
-	remote?: IRemote     // 开启远程日志记录
+	remote?: IRemote<T>  // 开启远程日志记录
 	log?: ILog<T>        // 开启日志记录
 }
 
@@ -14,8 +16,11 @@ export interface ILog<T> {
 	latest: number       // 最后更新时间
 }
 
-export interface IRemote {
-	fetch?: $Fetch
+export type CustomFetchType<T> = (data: ILog<T>) => Promise<any>
+
+export interface IRemote<T> {
+	url?: string
+	fetch?: CustomFetchType<T>
 }
 
 export type ErrorType<T extends any> = "network" | "functional" | T
@@ -25,5 +30,5 @@ export interface IError<T extends any = any> {
 	type: ErrorType<T>  // 错误类型
 	error: Error        // 错误对象
 	update: number      // 错误更新时间
-	info?: Record<string, string>  // 错误更多补充信息
+	info?: Record<string, any>  // 错误更多补充信息
 }

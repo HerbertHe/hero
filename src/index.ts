@@ -1,4 +1,5 @@
 import { freeLocalStorage, loadLocalStorage, storeToLocalStorage } from "./browser"
+import { uploadToRemote } from "./remote"
 import { IError, ILog, IOptions } from "./types"
 import { getHash, isBrowser } from "./utils"
 
@@ -71,6 +72,22 @@ export class Hero<T> {
 	}
 
 	/**
+	 * 上传日志，轮询自动上传
+	 */
+	// TODO 轮询上传日志
+	private _upload = async () => {
+		const { remote } = this._opitons
+		const local = loadLocalStorage<T>()
+		if (!!remote && !!remote.url && !!local) {
+			const { url, fetch } = remote
+			await uploadToRemote(url, local, () => {
+				// 释放本地存储
+				this._free()
+			}, this, fetch)
+		}
+	}
+
+	/**
 	 *
 	 * @param fn 原函数
 	 */
@@ -78,11 +95,16 @@ export class Hero<T> {
 		try {
 			await fn()
 		} catch (e) {
-			this._errs.push({
-				type: "functional",
-				error: e,
-				update: Date.now(),
-			})
+			if (e instanceof Error) {
+				this._errs.push({
+					type: "functional",
+					error: e,
+					update: Date.now(),
+				})
+			} else {
+				// 自定义错误类型捕获
+				this._errs.push(e)
+			}
 		}
 	}
 
