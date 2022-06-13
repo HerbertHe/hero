@@ -10,11 +10,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/sm-crypto": "^0.3.0",
     "tsup": "^6.1.2",
     "typescript": "^4.7.3",
     "vitest": "^0.14.2"
   },
   "dependencies": {
-    "ohmyfetch": "^0.4.18"
+    "ohmyfetch": "^0.4.18",
+    "sm-crypto": "^0.3.8"
   }
 }
